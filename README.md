@@ -1,6 +1,6 @@
 # PT
 Phân tứ. Phân chia. Phân đoạn. Phân cột. Phân lớp. Phân tầng. Phân tích. Phân phát. Phân khúc. Phân tách.
-id:  /82a88f49b8021ffe20a720cf45818a8b3338158d#
+id:
 nghệ thuật không gian tên {
 CommonCompilerTest :: CommonCompilerTest () {} 
 CommonCompilerTest :: ~ CommonCompilerTest () {} 
