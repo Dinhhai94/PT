@@ -1,2 +1,256 @@
 # PT
 Phân tứ. Phân chia. Phân đoạn. Phân cột. Phân lớp. Phân tầng. Phân tích. Phân phát. Phân khúc. Phân tách.
+id:  /82a88f49b8021ffe20a720cf45818a8b3338158d#
+nghệ thuật không gian tên {
+CommonCompilerTest :: CommonCompilerTest () {} 
+CommonCompilerTest :: ~ CommonCompilerTest () {} 
+void CommonCompilerTest :: MakeExecutable ( phương thức ArtMethod * ) {  
+  KIỂM TRA ( phương thức ! = Nullptr ); 
+  const CompiledMethod * compiled_method = nullptr ;  
+  if (! phương thức -> Is Ab. ()) {  
+    mirror :: DexCache * dex_cache = phương thức -> GetDeclaringClass () -> GetDexCache ();
+    const DexFile & dex_file = * dex_cache -> GetDexFile ();  
+    biên dịch_method =
+        compiler_driver_ -> GetCompiledMethod ( MethodReference (& dex_file ,
+                                                            phương thức -> GetDexMethod Index ()));
+  }
+  // Nếu kích thước mã bằng 0, điều đó có nghĩa là phương thức đã bị bỏ qua do quá trình biên dịch hướng dẫn hồ sơ.
+  nếu ( compiled_method =! nullptr && compiled_method -> GetQuickCode . () kích thước () ! = 0u ) {      
+    ArrayRef < const uint8_t > đang = compiled_method -> GetQuickCode (); 
+    const uint32_t code_size = đang . kích thước (); 
+    ArrayRef < const uint8_t > vmap_table = compiled_method -> GetVmapTable (); 
+    const uint32_t vmap_table_offset = vmap_table . trống rỗng () ? 0u   
+        : sizeof ( OatQuickMethodHeader ) + vmap_table . kích thước ();  
+    // Thông tin phương thức trực tiếp trước bảng vmap.
+    ArrayRef < const uint8_t > method_info = compiled_method -> GetMethodInfo (); 
+    const uint32_t method_info_offset = method_info . trống rỗng () ? 0u   
+        : vmap_table_offset + method_info . kích thước ();
+    Phương thức OatQuickMethodHeader_header ( vmap_table_offset ,
+                                       phương thức_info_offset ,
+                                       đã biên dịch_method -> GetFrameSizeInBytes (),
+                                       được biên dịch_method -> GetCoreSpillMask (),
+                                       được biên dịch_method -> GetFpSpillMask (),
+                                       mã_size );
+    header_code_and_maps_chunks_ . đẩy_back ( std :: vector <uint8_t> ());
+    std :: vector <uint8_t> * đoạn = & header_code_and_maps_chunks_ . trở lại (); 
+    const size_t max_padding = GetInstructionSetAlignment ( compiled_method -> GetInstructionSet ());  
+    const size_t size = method_info . kích thước () + vmap_table . size () + sizeof ( method_header ) + code_size ;     
+    chunk -> dự trữ ( kích thước + max_padding );
+    chunk -> thay đổi kích thước ( sizeof ( method_header ));
+    memcpy (& (* chunk ) [ 0 ], & method_header , sizeof ( method_header ));  
+    đoạn -> insert ( đoạn -> bắt đầu (), vmap_table . bắt đầu (), vmap_table . end ());
+    đoạn -> insert ( đoạn -> bắt đầu (), method_info . bắt đầu (), method_info . end ());
+    chunk -> insert ( chunk -> end (), code . started (), code . end ());
+    CHECK_EQ ( chunk -> size (), size );
+    const void * unalign_code_ptr = chunk -> data () + ( size - code_size );   
+    size_t bù đắp = dchecked_integral_cast <size_t> ( reinterpret_cast <uintptr_t> ( unaligned_code_ptr ));
+    size_t đệm = compiled_method -> AlignCode ( bù đắp ) - bù đắp ; 
+    // Đảm bảo không thay đổi kích thước.
+    CHECK_GE ( chunk -> dung lượng (), chunk -> size () + padding ); 
+    chunk -> insert ( chunk -> started (), padding , 0 ); 
+    const void * code_ptr = reinterpret_cast < const uint8_t *> ( unalign_code_ptr ) + padding ;    
+    CHECK_EQ ( code_ptr , static_cast < const void *> ( chunk -> data () + ( chunk -> size () - code_size )));     
+    MakeExecutable ( code_ptr , đang . Kích thước ());
+    const void * method_code = CompiledMethod :: CodePulum ( code_ptr ,  
+                                                          compiled_method -> GetInstructionSet ());
+    LOG ( INFO ) << "MakeExecutable" << phương thức -> PrettyMethod () << "code =" << method_code ;      
+    phương thức -> SetEntryPointFromQuickCompiledCode ( method_code );
+  } khác {  
+    // Không có mã? Bạn phải có nghĩa là đi vào phiên dịch.
+    // Hoặc JNI chung ...
+    class_linker_ -> SetEntryPointsToInterpreter ( phương thức );
+  }
+}
+void CommonCompilerTest :: MakeExecutable ( const void * code_start , size_t code_length ) {    
+  KIỂM TRA ( code_start =! Nullptr ); 
+  CHECK_NE ( code_length , 0U ); 
+  dữ liệu uintptr_t = reinterpret_cast <uintptr_t> ( code_start ); 
+  uintptr_t cơ sở = RoundDown ( dữ liệu , kPageSize ); 
+  giới hạn uintptr_t = RoundUp ( dữ liệu + code_length , kPageSize ); 
+  uintptr_t len = giới hạn - cơ sở ;
+  int result = mprotect ( reinterpret_cast < void *> ( cơ sở ), len , PROT_READ | PROT_WRITE | PROT_EXEC );
+  CHECK_EQ ( kết quả , 0 ); 
+  FlushIn cảnCache ( reinterpret_cast < char *> ( cơ sở ), reinterpret_cast < char *> ( cơ sở + len )); 
+}
+void CommonCompilerTest :: MakeExecutable ( ObjPtr < mirror :: ClassLoader > class_loader , 
+                                        const char * class_name ) {  
+  std :: chuỗi class_descriptor ( DotToDescriptor ( class_name ));
+  Chủ đề * tự = Chủ đề :: Hiện tại (); 
+  StackHandleScope < 1 > hs ( tự );
+  Xử lý < gương :: ClassLoader > loader ( hs . NewHandle ( class_loader ));
+  mirror :: Class * klass = class_linker_ -> FindClass ( tự , class_descriptor . c_str (), trình tải );
+  KIỂM TRA ( klass ! = Nullptr ) << "Không tìm thấy lớp" << class_name ;    
+  PointerSize pointer_size = class_linker_ -> GetImagePointerSize ();
+  for ( auto & m : klass -> GetMethods (con trỏ_size )) {  
+    MakeExecutable (& m );
+  }
+}
+// Lấy tập hợp các lớp hình ảnh được cung cấp cho trình điều khiển trình biên dịch trong SetUp. Lưu ý: trình biên dịch
+// trình điều khiển giả định quyền sở hữu của tập hợp, vì vậy kiểm tra sẽ giải phóng tập hợp đúng cách.
+std :: unordered_set < std :: string > * CommonCompilerTest :: GetImageC Cầu () {  
+  // Tập rỗng: theo mặc định không có lớp nào được giữ lại trong ảnh.
+  trở lại mới std :: unordered_set < std :: string > (); 
+}
+// Lấy tập hợp các lớp đã biên dịch được cung cấp cho trình điều khiển trình biên dịch trong SetUp. Lưu ý: trình biên dịch
+// trình điều khiển giả định quyền sở hữu của tập hợp, vì vậy kiểm tra sẽ giải phóng tập hợp đúng cách.
+std :: unordered_set < std :: string > * CommonCompilerTest :: GetCompiledC Cầu () {  
+  // Không, không có lựa chọn các lớp biên dịch.
+  trả về nullptr ; 
+}
+// Lấy tập hợp các phương thức đã biên dịch được cung cấp cho trình điều khiển trình biên dịch trong SetUp. Lưu ý: trình biên dịch
+// trình điều khiển giả định quyền sở hữu của tập hợp, vì vậy kiểm tra sẽ giải phóng tập hợp đúng cách.
+std :: unordered_set < std :: string > * CommonCompilerTest :: GetCompiledMethods () {  
+  // Không, không có lựa chọn các phương thức biên dịch.
+  trả về nullptr ; 
+}
+// Nhận ProfileCompilationInfo sẽ được chuyển đến trình điều khiển.
+ProfileCompilationInfo * CommonCompilerTest :: GetProfileCompilationInfo () {  
+  // Không, thông tin hồ sơ sẽ không được đưa vào tài khoản.
+  trả về nullptr ; 
+}
+void CommonCompilerTest :: SetUp () {  
+  CommonRuntimeTest :: Setup ();
+  {
+    ScopedObjectAccess soa ( Chủ đề :: Hiện tại ());
+    const Giảng dạy Hướng dẫn_set = kR.78ISA ; 
+    // Lấy tập hợp các tính năng hướng dẫn mặc định từ bản dựng.
+    hướng dẫn_set_features_ = Hướng dẫn SetFeatures :: FromCppDefines (); 
+    runtime_ -> SetIn cản Set ( hướng dẫn_set );
+    for ( uint32_t i = 0 ; i < static_cast < uint32_t > ( CalleeSaveType :: kLastCalleeSaveType ); ++ i ) {     
+      Loại CalleeSaveType = CalleeSaveType ( i ); 
+      if (! runtime_ -> HasCalleeSaveMethod ( loại )) {  
+        runtime_ -> SetCalleeSaveMethod ( runtime_ -> CreateCalleeSaveMethod (), type );
+      }
+    }
+    CreateCompilerDriver ( Trình biên dịch_kind_ , hướng dẫn_set );
+  }
+}
+void CommonCompilerTest :: CreateCompilerDriver ( Trình biên dịch :: Loại tốt , 
+                                              Tập lệnh isa ,
+                                              size_t number_of_threads ) { 
+  Trình biên dịch_options_ -> boot_image_ = true ; 
+  Trình biên dịch_options_ -> SetCompilerFilter ( GetCompilerFilter ());
+  trình biên dịch_do_ . đặt lại ( CompilerDriver mới ( Trình biên dịch_options_ . get (), 
+                                            xác minh_results_ . nhận (),
+                                            loại ,
+                                            isa ,
+                                            hướng dẫn_set_features_ . nhận (),
+                                            GetImageClass (),
+                                            GetCompiledClass (),
+                                            GetCompiledMethods (),
+                                            số_of_threads ,
+                                            / * exchange_fd * / - 1 , 
+                                            GetProfileCompilationInfo ()));
+  // Chúng tôi thường không tạo hình ảnh trong các thử nghiệm đơn vị, tắt tính năng tối ưu hóa này theo mặc định.
+  Trình biên dịch_do_ -> SetSupportBootImageFixup ( false );
+}
+void CommonCompilerTest :: SetUpR nbOptions ( tùy chọn RuntimeOptions * ) {  
+  CommonR.78Test :: SetUpRacerOptions ( tùy chọn );
+  trình biên dịch_options_ . đặt lại ( CompilerOptions mới ); 
+  xác minh_results_ . đặt lại ( VerifyingResults mới ( Trình biên dịch_options_ . get ())); 
+  QuickCompilerCallbacks * gọi lại =
+      QuickCompilerCallbacks mới ( CompilerCallbacks :: CallbackMode :: kCompileApp ); 
+  callbacks -> SetVerificationResults ( verification_results_ . lấy ());
+  gọi lại_ . đặt lại ( gọi lại );
+}
+Trình biên dịch :: Loại CommonCompilerTest :: GetCompilerKind () const {   
+  trả về trình biên dịch_kind_ ;
+}
+khoảng trống CommonCompilerTest :: SetCompilerKind ( Compiler :: Kind compiler_kind ) {  
+  Trình biên dịch_kind_ = Trình biên dịch_kind ;
+}
+Bộ hướng dẫn CommonCompilerTest :: GetIn cản Set () const {   
+  DCHECK ( compiler_driver_ . Lấy () =! Nullptr );  
+  return Trình biên dịch_do_ -> GetIn cản Set ();
+}
+void CommonCompilerTest :: TearDown () {  
+  trình biên dịch_do_ . đặt lại ();
+  gọi lại_ . đặt lại ();
+  xác minh_results_ . đặt lại ();
+  trình biên dịch_options_ . đặt lại ();
+  hình ảnh_ bảo tồn_ . đặt lại ();
+  CommonR nbTest :: TearDown ();
+}
+void CommonCompilerTest :: CompileClass ( mirror :: ClassLoader * class_loader , const char * class_name ) {    
+  std :: chuỗi class_descriptor ( DotToDescriptor ( class_name ));
+  Chủ đề * tự = Chủ đề :: Hiện tại (); 
+  StackHandleScope < 1 > hs ( tự );
+  Xử lý < gương :: ClassLoader > loader ( hs . NewHandle ( class_loader ));
+  mirror :: Class * klass = class_linker_ -> FindClass ( tự , class_descriptor . c_str (), trình tải );
+  KIỂM TRA ( klass ! = Nullptr ) << "Không tìm thấy lớp" << class_name ;    
+  auto pointer_size = class_linker_ -> GetImagePointerSize ();
+  for ( auto & m : klass -> GetMethods (con trỏ_size )) {  
+    CompileMethod (& m );
+  }
+}
+void CommonCompilerTest :: CompileMethod ( phương thức ArtMethod * ) {  
+  KIỂM TRA ( phương thức ! = Nullptr ); 
+  Định thời gian TimingLogger ( "CommonTest :: CompileMethod" , sai , sai );  
+  TimingLogger :: ScopedTiming t ( __FUNCTION__ , & hẹn giờ ); 
+  compiler_driver_ -> CompileOne ( Chủ đề :: Current (), phương pháp , và timings ); 
+  TimingLogger :: ScopedTiming t2 ( "MakeExecutable" , & timings ); 
+  MakeExecutable ( phương thức );
+}
+void CommonCompilerTest :: CompileDirectMethod ( Xử lý < mirror :: ClassLoader > class_loader , 
+                                             const char * class_name , const char * method_name ,   
+                                             const char * chữ ký ) {  
+  std :: chuỗi class_descriptor ( DotToDescriptor ( class_name ));
+  Chủ đề * tự = Chủ đề :: Hiện tại (); 
+  mirror :: Class * klass = class_linker_ -> FindClass ( tự , class_descriptor . c_str (), class_loader );
+  KIỂM TRA ( klass ! = Nullptr ) << "Không tìm thấy lớp" << class_name ;    
+  auto pointer_size = class_linker_ -> GetImagePointerSize ();
+  ArtMethod * method = klass -> FindClassMethod ( method_name , chữ ký , con trỏ_size );
+  KIỂM TRA ( phương thức ! = Nullptr && phương thức -> IsDirect ()) << "Không tìm thấy phương thức trực tiếp:"    
+      << class_name << "." << method_name << chữ ký ;  
+  CompileMethod ( phương thức );
+}
+void CommonCompilerTest :: CompileVirtualMethod ( Xử lý < mirror :: ClassLoader > class_loader , 
+                                              const char * class_name , const char * method_name ,   
+                                              const char * chữ ký ) {  
+  std :: chuỗi class_descriptor ( DotToDescriptor ( class_name ));
+  Chủ đề * tự = Chủ đề :: Hiện tại (); 
+  mirror :: Class * klass = class_linker_ -> FindClass ( tự , class_descriptor . c_str (), class_loader );
+  KIỂM TRA ( klass ! = Nullptr ) << "Không tìm thấy lớp" << class_name ;    
+  auto pointer_size = class_linker_ -> GetImagePointerSize ();
+  ArtMethod * method = klass -> FindClassMethod ( method_name , chữ ký , con trỏ_size );
+  KIỂM TRA ( phương thức ! = Nullptr && ! Phương thức -> IsDirect ()) << "Không tìm thấy phương thức ảo:"     
+      << class_name << "." << method_name << chữ ký ;  
+  CompileMethod ( phương thức );
+}
+void CommonCompilerTest :: ReserveImageSpace () {  
+  // Dự trữ nơi hình ảnh sẽ được tải lên phía trước để các phần khác của thử nghiệm được thiết lập không
+  // vô tình kết thúc va chạm với địa chỉ bộ nhớ.
+                                   
+                                                ( size_t ) 
+                                                sai / * không cần cờ 4gb với mmap cố định * / , 
+                                                sai / * không sử dụng lại đặt chỗ hiện tại * / , 
+                                                & error_msg ));
+  KIỂM TRA ( image_reservation_ . Lấy () =! Nullptr ) << ERROR_MSG ;   
+}
+void CommonCompilerTest :: UnreserveImageSpace () {  
+  hình ảnh_ bảo tồn_ . đặt lại ();
+}
+} // nghệ thuật không gian tên  
+Cung nghệ thuật không gian tiếp cận mã coi.
+include "common_compiler_test.dbh" 
+#include "arch / guide_set_features.dbh" 
+#include "art_field-inl.dbh" 
+//include "art_method-inl.dbh" 
+/include "cơ sở / callee_save_type.dbh" 
+#/include "cơ sở / enums.dbh" 
+#include "cơ sở / utils.dbh" 
+//include "class_linker.dbh" 
+#/include "comp_method-inl.dbh" 
+#inc loại "dex / descriptors_names.dbh" 
+//include "dex / quick_compiler_callbacks.dbh" 
+#/inc loại "dex / verify_results.dbh" 
+#include "trình điều khiển / trình biên dịch_do.dbh" 
+//inc loại "trình điều khiển / trình biên dịch_options.dbh" 
+#/include "thông dịch viên / thông dịch viên / trình dịch chủ động / trợ lý ảo
+#include "gương / đẳng cấp inl.dbh" 
+//include "gương / class_loader.dbh" 
+#/include "gương / dex_cache.dbh" 
+//include "gương / đối tượng inl.dbh" 
+//include "oat_quick_method_header.dbh" 
+/include "scoped_thread_state_change-inl.dbh" 
+//include "thread-hiện tại-inl.dbh" 
