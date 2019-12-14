@@ -1,0 +1,94 @@
+{{Infobox OS
+| name                   = Haiku
+| logo                   = [[File:haikulogov2.png|Haiku Project logo|300px]]
+| screenshot             = [[File:Haiku OS.png|300px]]
+| caption                =
+| website                = {{URL|//haiku-os.org/}}
+| developer              = [[Haiku, Inc.]]
+| family                 = [[Haiku]] [[BeOS]]
+| source model           = [[Mã nguồn mở]]
+| released               = {{Start date and age|2008}}
+| latest release version =
+| latest release date    =
+| latest preview version = R1 Alpha 4.1
+| latest preview date    = {{Start date and age|2019|10|14}}
+| frequently updated     =
+| marketing target       = [[Máy tính cá nhân]]
+| language               = [[Đa ngôn ngữ]] [[Ngôn ngữ viết]]
+| kernel type            = [[Phân tử]]
+| userland               = [[Lập trình viên]]
+| ui                     = [[Màn hình]]
+| license                = [[Creative Commons]] & Be Sample Code License
+| working state          = [[Phát triển]]
+| supported platforms    = [[IA-32]] [[IA-64]] [[Chromium]]
+| updatemodel            =
+| package manager        =
+}}
+'''Haiku''' là một [[hệ điều hành]] [[mã nguồn mở]] tương thích với [[BeOS]] đã ngừng phát triển. Bắt đầu phát triển năm 2001 và hệ điều hành trở nên tự lưu trữ trong năm 2008.<ref name="self-hosting"><cite class="citation web" contenteditable="false">Bruno Albuquerque (2008-04-01). </cite></ref> Bản phát hành [[Vòng đời phát hành phần mềm|alpha]] đầu tiên phát hành tháng 9/2009, bản mới nhất được phát hành tháng 11/2012.
+
+Haiku được hỗ trợ bởi Haiku, Inc., một [[tổ chức phi lợi nhuận]] có trụ sở ở [[Rochester, New York|Rochester]], [[Tiểu bang New York|New York]], US, Thành lập năm 2003 bởi cựu lãnh đạo dự án Michael Phipps.<ref name="Who is behind Haiku?"><cite class="citation web" contenteditable="false">[http://www.haiku-os.org/about "What is Haiku?"]</cite></ref>
+
+== Lịch sử ==
+Haiku bắt đầu với tên gọi dự án ''OpenBeOS'' năm 2001, khi đó Be, Inc. vừa được bán cho Palm, Inc. và các hoạt động phát triển BeOS bị dừng lại; trọng tâm của dự án là hỗ trợ cộng đồng người dùng BeOS bằng cách tạo ra một sự thay thế mã nguồn mở, tương thích cho BeOS. Dự án đầu tiên của OpenBeOS là tạo một cập nhật "stop-gap" cho BeOS 5.0.3 năm 2002. Năm 2003, Tổ chức phi lợi nhuận Haiku, Inc. được đăng ký ở Rochester, New York, để hỗ trợ tài chính cho hoạt động phát triển, và trong năm 2004, sau một thông báo vi phạm bản quyền thương hiệu BeOS của Palm's được gửi đến OpenBeOS, dự án được đổi tên thành ''Haiku''. Tuy nhiên, sự phát triển chỉ đạt tới cột mốc đầu tiên của mình vào tháng 9/2009 với việc phát hành Haiku R1/Alpha 1.
+
+== Công nghệ ==
+Haiku được viết bằng [[C++]] và cung cấp một [[Giao diện lập trình ứng dụng|API]] [[Lập trình hướng đối tượng]].
+
+Thiết kế modul<ref><cite class="citation web" contenteditable="false">[https://www.maketecheasier.com/haiku-beos-for-the-21st-century/ "Haiku: BeOS for the 21st Century"]<span class="reference-accessdate">. </span></cite></ref> của BeOS cho phép các thành phần riêng lẻ của Haiku để bước đầu được phát triển trong các đội tương đối tách biệt, trong nhiều trường hợp phát triển chúng để thay thế cho các thành phần BeOS trước khi hoàn thành các phần khác của hệ điều hành. Các nhóm ban đầu phát triển các thành phần này, bao gồm cả [[server]] và các [[API]] (được gọi chung trong Haiku là "kit"), bao gồm:
+* '''App/Interface''' – Phát triển các gói [[Giao diện người dùng|giao diện]], [[Phần mềm ứng dụng|ứng dụng]] và các gói hỗ trợ.
+* '''BFS''' – develops the Be File System, mà chủ yếu hoàn thành với tên gọi OpenBFS.
+* '''Game''' – phát triển Game Kit và các API của nó.
+* '''Input Server''' – Các máy chủ xử lý các thiết bị đầu vào, chẳng hạn như bàn phím và chuột, và cách chúng giao tiếp với các bộ phận khác của hệ thống.
+* '''Kernel''' – Phát triển [[Nhân hệ điều hành|kernel]], lõi của hệ điều hành
+* '''Media''' – phát triển các máy chủ âm thanh và các API có liên quan.
+* '''MIDI''' – Thực hiện các giao thức [[MIDI]].
+* '''Network''' – Viết các [[driver]] cho các thiết bị mạng và các API có liên quan đến mạng.
+* '''OpenGL''' – Phát triển các hỗ trợ [[OpenGL]].
+* '''Preferences''' – Tái tạo các bộ tùy chọn.
+* '''Printing''' – hoạt động trên các máy chủ in và [[driver]] cho máy in.
+* '''Screen Saver''' – Thực hiện các chức năng bộ bảo vệ màn hình.
+* '''Storage''' – phát triển bộ lưu trữ và trình điều khiển cho hệ thống tập tin cần thiết.
+* '''Translation''' – tái tạo các modul đọc/viết/chuyển đổi cho các định dạng tập tin khác nhau.
+Một vài bộ dụng cụ đã được coi là tính năng hoàn chỉnh và phần còn lại đang trong giai đoạn phát triển khác nhau.
+
+Hạt nhân của Haiku là một hybrid kernel and a forkvà là phân nhánh của NewOS,<ref><cite class="citation web" contenteditable="false">[http://web.archive.org/web/20080609085932/http://www.haiku-os.org/about/teams/kernel_drivers "Haiku Kernel & Drivers Team"]. </cite></ref> một modul hạt nhân được viết bởi cựu kỹ sư của Be Inc. Travis Geiselbrecht. Giống như phần còn lại của hệ thống, nó là hiện nay vẫn đang phát triển. Nhiều tính năng đã được thực hiện, bao gồm một lớp hệ thống tập tin ảo (VFS) và đa đối xứng (SMP) hỗ trợ thô sơ.
+
+== Quản lý gói ==
+Tính đến tháng 9/2013, Haiku bao gồm một hệ thống quản lý gói cho phép phần mềm được biên dịch vào thành phụ thuộc theo dõi các gói tin nén.<ref><cite class="citation web" contenteditable="false">[http://www.haiku-os.org/blog/bonefish/2013-09-28_package_management_goes_live "Package Management now live"]<span class="reference-accessdate">. </span></cite></ref> Các gói tin có thể kích hoạt bằng cách cài đặt chúng từ một kho lưu trữ từ xa với [[pkgman]], hoặc thả chúng trong một thư mục gói tin đặc biệt. Quản lý gói tin của Haiku kết nối các gói tin đã kích hoạt thông qua một thư mục hệ thống chỉ đọc. Hệ thống quản lý gói tin của Haiku giải quyết các lệ thuộc bằng thư viện libsolv từ dự án [[openSUSE]] .<ref><cite class="citation web" contenteditable="false">[https://www.openhub.net/p/libsolv "The libsolv Open Source Project on Open Hub"]. ''www.openhub.net''<span class="reference-accessdate">. </span></cite></ref>
+
+== Tương thích BeOS ==
+Haiku R1 cố gắng để tương thích với BeOS ở cả hai cấp độ mã nguồn và nhị phân, cho phép phần mềm viết và [[biên dịch]] cho BeOS có thể biên dịch và hoạt động mà không có chỉnh sửa nào trên Haiku. Điều này cung cấp cho người dùng Haiku một thư viện tức thì của các ứng dụng để lựa chọn (thậm chí các chương trình mà các nhà phát triển không còn kinh doanh hoặc không cập nhật chúng nữa), ngoài việc cho phép phát triển các ứng dụng để tiếp tục từ nơi họ đã chấm dứt sau sự sụp đổ của Be, Inc.
+
+Việc cố gắng tương thích này có nhược điểm của nó — qua việc yêu cầu Haiku sử dụng một phân nhánh của trình biên dịch [[Bộ trình dịch GNU|GCC]], dựa trên phiên bản 2.95, phát hành năm 2001.<ref><cite class="citation web" contenteditable="false">The GCC team (2007-07-25). </cite></ref> Việc chuyển sang phiên bản 4 mới hơn của GCC phá vỡ khả năng tương thích với các phần mềm BeOS; bởi vậy Haiku hỗ trợ xây dựng các ứng dụng như một môi trường hybrid GCC4/GCC2.<ref><cite class="citation web" contenteditable="false">Stephan Aßmus (2008-05-18). </cite></ref> điều này cho phép hệ điều hành chạy cả hai tập tin nhị phân GCC phiên bản 2 và 4 cùng lúc. Những thay đổi được thực hiện để GCC 2.95 cho Haiku bao gồm ký tự hỗ trợ rộng rãi và backport của bản sửa lỗi từ GCC 3 và sau này.<ref><cite class="citation web" contenteditable="false">[http://cgit.haiku-os.org/buildtools/log/legacy "Haiku legacy build tools sourcecode history"].</cite><span class="Z3988" title="ctx_ver=Z39.88-2004&rfr_id=info%3Asid%2Fen.wikipedia.org%3AHaiku+%28operating+system%29&rft.btitle=Haiku+legacy+build+tools+sourcecode+history&rft.genre=unknown&rft_id=http%3A%2F%2Fcgit.haiku-os.org%2Fbuildtools%2Flog%2Flegacy&rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook" contenteditable="false">&nbsp;</span></ref>
+
+Lưu ý rằng tính tương thích này chỉ áp dụng cho các hệ thống 32-bit x86. Phiên bản [[PowerPC]] của BeOS R5 không hỗ trợ. Như một hệ quả, các kiến trúc [[Cấu trúc ARM|ARM]], 68k, [[X86-64|64-bit x86]] và cổng [[PPC]] của Haiku chỉ dùng phiên bản GCC 4.
+
+Mặc dù có những nỗ lực, khả năng tương thích với một số hệ thống add-ons sử dụng API riêng tư sẽ không được thực hiện. Chúng bao gồm các [[trình điều khiển]] hệ thống tập tin bổ sung và các codec media, mặc dù chỉ ảnh hưởng đến các add-ons trên BeOS R5 không dễ dàng tái triển khai bộ giải mã đa phương tiện Indeo 5 không còn đặc điểm kỹ thuật tồn tại.
+
+Các ứng dụng nhị phân cua R5 hoạt động trên nền tảng Haiku (Tháng 5/2006) bao gồm: [[Opera (trình duyệt web)|Opera]], [[Mozilla Firefox|Firefox]], NetPositive, Quake II, Quake III, SeaMonkey, Vision và [[VLC media player|VLC]].
+
+== Sau R1 ==
+Kế hoạch ban đầu của R2 được bắt đầu thông qua dự án "Glass Elevator". Các chi tiết chỉ xác nhận cho đến nay là nó sẽ chuyển sang phiên bản hiện tại của GCC.
+
+Một lớp tương thích được lên kế hoạch sẽ cho phép các ứng dụng được phát triển cho Haiku R1 để chạy trên Haiku R2 và sau đó. Điều này đã được đề cập trong một cuộc thảo luận trên [[mailing list]] của Haiku bởi một trong số những người đứng đầu nhóm phát triển, Axel Dörfler. Các tính năng mới bao gồm đề nghị tập tin chỉ mục ngang hàng với Beagle của [[Unix]], [[Google Desktop]] và [[Spotlight]] của [[OS X]] , tích hợp lớn hơn của đồ họa vector vào máy tính để bàn, hỗ trợ thích đáng cho nhiều người dùng, và bộ dụng cụ khác.<ref>[http://ge.blubinc.net/r/2/_/R2_Ideas_aeaf.html R2 Ideas – Glass Elevator Summaries]</ref>
+
+== Yêu cầu cấu hình ==
+* Một kiến trúc [[32-bit]] [[x86]] giống như IA-32 của [[Intel|Int]]<nowiki/>el<ref name="haiku_rel41"><cite class="citation web" contenteditable="false">[http://www.haiku-os.org/get-haiku/release-notes "Release Notes &#x7C; Haiku Project"]. haiku-os.org<span class="reference-accessdate">. </span></cite></ref>
+* Bộ nhớ: 128 MB,đệ tự biên dịch Haiku cần 1 GB<ref name="haiku_rel41"/>
+* Ổ cứng: 700 MB<ref name="haiku_rel41"/>
+
+== Chú thích ==
+{{Reflist|2}}
+
+== Liên kết ngoài ==
+* <span class="official-website" contenteditable="false"><span class="url">[//haiku-os.org/ Official website]</span></span><span class="official-website" contenteditable="false"></span>
+* [https://www.youtube.com/watch?v=LxAQxGQB1A8 <span class="plainlinks">Haiku Tech Talk at Google (February 13, 2007)</span>]<span contenteditable="false"> on </span>[[YouTube]]
+* <cite class="citation web" contenteditable="false">Ryan Leavengood (May 2012). </cite><cite class="citation web" contenteditable="false">[http://spectrum.ieee.org/computing/software/the-dawn-of-haiku-os/0 "The Dawn of Haiku OS"]. IEEE Spectrum<span class="reference-accessdate">. </span></cite><cite class="citation web" contenteditable="false"><span class="reference-accessdate">Retrieved <span class="nowrap">30 April</span> 2012</span>.</cite><span class="Z3988" title="ctx_ver=Z39.88-2004&rfr_id=info%3Asid%2Fen.wikipedia.org%3AHaiku+%28operating+system%29&rft.au=Ryan+Leavengood&rft.btitle=The+Dawn+of+Haiku+OS&rft.date=2012-05&rft.genre=unknown&rft_id=http%3A%2F%2Fspectrum.ieee.org%2Fcomputing%2Fsoftware%2Fthe-dawn-of-haiku-os%2F0&rft.pub=IEEE+Spectrum&rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook" contenteditable="false">&nbsp;</span>
+
+[[Thể loại:Phần mềm năm 2008]]
+[[Thể loại:Phần mềm tự do]]
+[[Thể loại:Hệ điều hành tự do]]
+[[Thể loại:Hệ điều hành Haiku]]
+[[Thể loại:Hệ điều hành x86]]
+[[Thể loại:Hệ điều hành Chromium]]
+[[Thể loại:Đa ngôn ngữ]]
